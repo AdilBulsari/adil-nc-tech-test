@@ -6,6 +6,12 @@ exports.fetchCards = () => {
     .readFile("./src/data/cards.json", "utf-8")
     .then((data) => {
       const cards = JSON.parse(data);
+      if (cards.length === 0) {
+        return Promise.reject({
+          message: "No cards found !!!",
+          status: "400",
+        });
+      }
       return fs.readFile("./src/data/templates.json", "utf-8").then((data) => {
         const templates = JSON.parse(data);
         for (let i in cards) {
@@ -19,18 +25,14 @@ exports.fetchCards = () => {
             }
           }
         }
-
         return result;
       });
     })
     .catch((err) => {
-      console.log(err);
-      if (err) {
-        return Promise.reject({
-          message: "No cards found !!!",
-          status: "400",
-        });
-      }
+      return Promise.reject({
+        message: "Read file error",
+        status: 73,
+      });
     });
 };
 
@@ -84,4 +86,44 @@ exports.fetchCardById = (cardId) => {
   }
 };
 
-exports.addCardById = (cardId) => {};
+exports.addCard = (cardToPost) => {
+  const cardBody = Object.keys(cardToPost);
+
+  if (
+    cardBody.length < 4 ||
+    typeof cardToPost["basePrice"] !== "number" ||
+    typeof cardToPost["pages"] !== "object" ||
+    typeof cardToPost["title"] !== "string"
+  ) {
+    return Promise.reject({
+      message: "Bad Request",
+      status: 400,
+    });
+  }
+
+  return fs
+    .readFile("./src/data/cards.json", { encoding: "utf-8" })
+    .then((data) => {
+      console.log("Hello");
+      const cards = JSON.parse(data);
+      if (cards.length === 0) {
+        cards.push({ id: "card001", ...cardToPost });
+      } else {
+        cards.push({ id: `card00${cards.length + 1}`, ...cardToPost });
+      }
+
+      const newData = JSON.stringify(cards);
+
+      return fs
+        .writeFile("./src/data/cards.json", newData)
+        .then(() => {
+          return { card: cards[cards.length - 1] };
+        })
+        .catch((err) => {
+          return Promise({
+            message: "Something went wrong",
+            status: 404,
+          });
+        });
+    });
+};

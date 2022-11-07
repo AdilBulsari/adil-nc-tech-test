@@ -160,9 +160,78 @@ describe("GET /cards/:Id", () => {
   test("404 : returns error message gived id is not found within card data ", async () => {
     return request(app)
       .get("/cards/card006")
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
         expect(body.message).toEqual("card id not found !!");
       });
   });
+});
+
+describe("POST /cards", () => {
+  test("400 :post card with missing values", () => {
+    const inValidCardPost = {
+      title: "card 3 title",
+      // sizes: ["md", "lg"],
+      basePrice: "200",
+      pages: [
+        {
+          title: "Front Cover",
+          templateId: "template006",
+        },
+        {
+          title: "Inside Top",
+          templateId: "template007",
+        },
+        {
+          title: "Inside Bottom",
+          templateId: "template007",
+        },
+        {
+          title: "Back Cover",
+          templateId: "template008",
+        },
+      ],
+    };
+
+    return request(app)
+      .post("/cards")
+      .send(inValidCardPost)
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad Request");
+      });
+  });
+
+  const cardToPost =
+    test.skip("200 :post single card when correct data is entered", () => {
+      return request(app)
+        .post("/cards")
+        .send({
+          title: "card 3 title",
+          sizes: ["md", "lg"],
+          basePrice: 200,
+          pages: [
+            {
+              title: "Front Cover",
+              templateId: "template006",
+            },
+            {
+              title: "Inside Top",
+              templateId: "template007",
+            },
+            {
+              title: "Inside Bottom",
+              templateId: "template007",
+            },
+            {
+              title: "Back Cover",
+              templateId: "template008",
+            },
+          ],
+        })
+        .expect(200)
+        .then((res) => {
+          expect(res.body).toEqual(cardToPost);
+        });
+    });
 });

@@ -1,19 +1,12 @@
-const {
-  getCards,
-  getCardById,
-  postCardById,
-} = require("./controller/cards.controller");
-
+const cors = require("cors");
 const express = require("express");
+const routes = require("./routes/routes");
+
 const app = express();
 
-app.set("json spaces", 2);
-
-app.get("/cards", getCards);
-
-app.get("/cards/:cardId", getCardById);
-
-app.post("/cards/:cardId", postCardById);
+app.use(express.json());
+app.use(cors());
+app.use(routes);
 
 app.use("*", (req, res) => {
   res.status(404).send({
@@ -23,7 +16,7 @@ app.use("*", (req, res) => {
 
 app.use((err, req, res, next) => {
   if (err.status && err.message) {
-    res.status(400).send({
+    res.status(err.status).send({
       message: err.message,
     });
   } else {
