@@ -2,16 +2,15 @@ const fs = require("fs/promises");
 
 exports.fetchCards = () => {
   const result = [];
-  return fs
-    .readFile("./src/data/cards.json", "utf-8")
-    .then((data) => {
-      const cards = JSON.parse(data);
-      if (cards.length === 0) {
-        return Promise.reject({
-          message: "No cards found !!!",
-          status: "400",
-        });
-      }
+  return fs.readFile("./src/data/cards.json", "utf-8").then((data) => {
+    const cards = JSON.parse(data);
+
+    if (cards.length === 0) {
+      return Promise.reject({
+        message: "No cards found !!!",
+        status: 404,
+      });
+    } else {
       return fs.readFile("./src/data/templates.json", "utf-8").then((data) => {
         const templates = JSON.parse(data);
         for (let i in cards) {
@@ -27,13 +26,8 @@ exports.fetchCards = () => {
         }
         return result;
       });
-    })
-    .catch((err) => {
-      return Promise.reject({
-        message: "Read file error",
-        status: 73,
-      });
-    });
+    }
+  });
 };
 
 exports.fetchCardById = (cardId) => {
@@ -117,7 +111,13 @@ exports.addCard = (cardToPost) => {
       return fs
         .writeFile("./src/data/cards.json", newData)
         .then(() => {
-          return { card: cards[cards.length - 1] };
+          const getCardById = this.fetchCardById(
+            cards[cards.length - 1]["id"]
+          ).then((data) => {
+            return data;
+          });
+
+          return getCardById;
         })
         .catch((err) => {
           return Promise({

@@ -30,8 +30,8 @@ exports.postCard = (req, res, next) => {
   const cardToPost = req.body;
 
   addCard(cardToPost)
-    .then(({ card }) => {
-      res.status(200).send(card);
+    .then((data) => {
+      res.status(200).send(data);
     })
     .catch((err) => {
       next(err);
