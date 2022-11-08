@@ -1,4 +1,9 @@
-const { fetchCards, fetchCardById, addCard } = require("../model/cards.model");
+const {
+  fetchCards,
+  deleteCard,
+  fetchCardById,
+  addCard,
+} = require("../model/cards.model");
 
 exports.getCards = (req, res, next) => {
   fetchCards()
@@ -32,6 +37,18 @@ exports.postCard = (req, res, next) => {
   addCard(cardToPost)
     .then((data) => {
       res.status(200).send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.deleteCardById = (req, res, next) => {
+  const { cardId } = req.params;
+
+  deleteCard(cardId)
+    .then(({ message }) => {
+      res.status(200).send({ message });
     })
     .catch((err) => {
       next(err);

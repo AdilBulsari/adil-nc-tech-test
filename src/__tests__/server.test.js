@@ -234,3 +234,32 @@ describe("GET /cards/:Id", () => {
       });
   });
 });
+
+describe.only("DELETE card", () => {
+  test("400 : Passing a valid id which is already deleted or not present", () => {
+    return request(app)
+      .delete("/cards/card001")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toEqual(
+          "This id card is already deleted or id not found"
+        );
+      });
+  });
+  test("400 : Passing an id which is not valid/does not start with card", () => {
+    return request(app)
+      .delete("/cards/car1")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toEqual("invalid id");
+      });
+  });
+  test("200 : Passing an id which is valid and is deleted successfully", () => {
+    return request(app)
+      .delete("/cards/card004")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.message).toEqual("deleted");
+      });
+  });
+});

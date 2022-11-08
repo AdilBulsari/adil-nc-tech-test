@@ -98,7 +98,6 @@ exports.addCard = (cardToPost) => {
   return fs
     .readFile("./src/data/cards.json", { encoding: "utf-8" })
     .then((data) => {
-      console.log("Hello");
       const cards = JSON.parse(data);
       if (cards.length === 0) {
         cards.push({ id: "card001", ...cardToPost });
@@ -108,22 +107,44 @@ exports.addCard = (cardToPost) => {
 
       const newData = JSON.stringify(cards);
 
-      return fs
-        .writeFile("./src/data/cards.json", newData)
-        .then(() => {
-          const getCardById = this.fetchCardById(
-            cards[cards.length - 1]["id"]
-          ).then((data) => {
-            return data;
-          });
-
-          return getCardById;
-        })
-        .catch((err) => {
-          return Promise({
-            message: "Something went wrong",
-            status: 404,
-          });
+      return fs.writeFile("./src/data/cards.json", newData).then(() => {
+        const getCardById = this.fetchCardById(
+          cards[cards.length - 1]["id"]
+        ).then((data) => {
+          return data;
         });
+
+        return getCardById;
+      });
     });
+};
+
+exports.deleteCard = (cardId) => {
+  if (cardId.startsWith("card")) {
+    return fs.readFile("./src/data/cards.json", "utf-8").then((data) => {
+      const cards = JSON.parse(data);
+
+      const isDeleted = cards.find((card) => card["id"] === cardId);
+      if (!isDeleted) {
+        return Promise.reject({
+          message: "This id card is already deleted or id not found",
+          status: 404,
+        });
+      } else {
+        const filteredData = cards.filter((card) => card["id"] !== cardId);
+        return fs
+          .writeFile("./src/data/cards.json", JSON.stringify(filteredData))
+          .then(() => {
+            return {
+              message: "deleted",
+            };
+          });
+      }
+    });
+  } else {
+    return Promise.reject({
+      message: "invalid id",
+      status: 400,
+    });
+  }
 };
