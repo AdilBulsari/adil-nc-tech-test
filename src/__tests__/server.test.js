@@ -285,7 +285,7 @@ describe("GET /cards/:Id", () => {
   });
 });
 
-describe.only("DELETE card", () => {
+describe("DELETE card", () => {
   test("404 : Passing a valid id which is already deleted or not present", () => {
     return request(app)
       .delete("/cards/card001")
