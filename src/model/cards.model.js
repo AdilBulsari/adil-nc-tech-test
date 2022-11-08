@@ -1,14 +1,15 @@
 const fs = require("fs/promises");
+const { StatusCodes } = require("http-status-codes");
 
 exports.fetchCards = () => {
   const result = [];
   return fs.readFile("./src/data/cards.json", "utf-8").then((data) => {
-    const cards = JSON.parse(data);
+    const cards = [...JSON.parse(data)];
 
     if (cards.length === 0) {
       return Promise.reject({
         message: "No cards found !!!",
-        status: 404,
+        status: StatusCodes.ACCEPTED,
       });
     } else {
       return fs.readFile("./src/data/templates.json", "utf-8").then((data) => {
@@ -29,7 +30,7 @@ exports.fetchCards = () => {
     }
   });
 };
-
+// FETCH THE CARD BY CARD ID --------------
 exports.fetchCardById = (cardId) => {
   if (cardId.startsWith("card")) {
     let result = [];
@@ -40,7 +41,7 @@ exports.fetchCardById = (cardId) => {
       if (cardFound.length === 0) {
         return Promise.reject({
           message: "card id not found !!",
-          status: 404,
+          status: StatusCodes.NOT_FOUND,
         });
       } else {
         return fs
@@ -75,11 +76,11 @@ exports.fetchCardById = (cardId) => {
   } else {
     return Promise.reject({
       message: "invalid id",
-      status: 400,
+      status: StatusCodes.BAD_REQUEST,
     });
   }
 };
-
+// ADD THE CARD  --------------
 exports.addCard = (cardToPost) => {
   const cardBody = Object.keys(cardToPost);
 
@@ -91,7 +92,7 @@ exports.addCard = (cardToPost) => {
   ) {
     return Promise.reject({
       message: "Bad Request",
-      status: 400,
+      status: StatusCodes.BAD_REQUEST,
     });
   }
 
@@ -107,18 +108,32 @@ exports.addCard = (cardToPost) => {
 
       const newData = JSON.stringify(cards);
 
-      return fs.writeFile("./src/data/cards.json", newData).then(() => {
-        const getCardById = this.fetchCardById(
-          cards[cards.length - 1]["id"]
-        ).then((data) => {
-          return data;
-        });
+      return fs
+        .writeFile("./src/data/cards.json", newData)
+        .then(() => {
+          const getCardById = this.fetchCardById(
+            cards[cards.length - 1]["id"]
+          ).then((data) => {
+            return data;
+          });
 
-        return getCardById;
+          return getCardById;
+        })
+        .catch(() => {
+          return Promise.reject({
+            message: "Cannot write data",
+            status: StatusCodes.UNPROCESSABLE_ENTITY,
+          });
+        });
+    })
+    .catch(() => {
+      return Promise.reject({
+        message: "Cannot read data",
+        status: StatusCodes.UNPROCESSABLE_ENTITY,
       });
     });
 };
-
+// DELETE THE CARD BY CARD ID --------------
 exports.deleteCard = (cardId) => {
   if (cardId.startsWith("card")) {
     return fs.readFile("./src/data/cards.json", "utf-8").then((data) => {
@@ -144,7 +159,7 @@ exports.deleteCard = (cardId) => {
   } else {
     return Promise.reject({
       message: "invalid id",
-      status: 400,
+      status: StatusCodes.BAD_REQUEST,
     });
   }
 };
