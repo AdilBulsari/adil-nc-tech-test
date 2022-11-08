@@ -10,7 +10,7 @@ app.use(routes);
 
 app.use("*", (req, res) => {
   res.status(404).send({
-    message: "does not exist",
+    message: "route does not exist",
   });
 });
 

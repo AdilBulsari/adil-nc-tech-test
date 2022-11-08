@@ -2,13 +2,13 @@ const {
   getCards,
   getCardById,
   postCard,
+  deleteCardById,
 } = require("../controller/cards.controller");
 
 const routes = require("express").Router();
 
-routes.get("/cards", getCards);
+routes.route("/cards").post(postCard).get(getCards);
 
-routes.get("/cards/:cardId", getCardById);
+routes.route("/cards/:cardId").get(getCardById).delete(deleteCardById);
 
-routes.post("/cards", postCard);
 module.exports = routes;
