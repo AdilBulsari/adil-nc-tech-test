@@ -32,8 +32,8 @@ exports.fetchCards = () => {
 };
 // FETCH THE CARD BY CARD ID --------------
 exports.fetchCardById = (cardId) => {
-  const regex= /^card[0-9]+$/g;
-  if (regex).test(cardId)) {
+  const regex = /^card[0-9]+$/g;
+  if (regex.test(cardId)) {
     let result = [];
     return fs.readFile("./src/data/cards.json", "utf-8").then((data) => {
       const cards = JSON.parse(data);
@@ -136,8 +136,8 @@ exports.addCard = (cardToPost) => {
 };
 // DELETE THE CARD BY CARD ID --------------
 exports.deleteCard = (cardId) => {
-    const regex= /^card[0-9]+$/g;
-  if (regex).test(cardId)) {
+  const regex = /^card[0-9]+$/g;
+  if (regex.test(cardId)) {
     return fs.readFile("./src/data/cards.json", "utf-8").then((data) => {
       const cards = JSON.parse(data);
 
